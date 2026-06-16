@@ -37,7 +37,7 @@ env:
   # Default = full upstream build. To produce a trimmed build instead, set e.g.
   #   CARGO_BUILD_FLAGS: "--no-default-features --features wgsl,vulkan,dx12,metal,gles"
   # and add a [profile.release] (lto/opt-level/strip/panic=abort) in the fork.
-  CARGO_BUILD_FLAGS: "" 
+  CARGO_BUILD_FLAGS: ""
 
 jobs:
   build:
@@ -53,7 +53,8 @@ jobs:
           - { rid: linux-arm64, os: ubuntu-latest,  target: aarch64-unknown-linux-gnu, lib: libwgpu_native.so, apt: gcc-aarch64-linux-gnu, linker: aarch64-linux-gnu-gcc }
           - { rid: osx-x64,     os: macos-latest,   target: x86_64-apple-darwin,       lib: libwgpu_native.dylib }
           - { rid: osx-arm64,   os: macos-latest,   target: aarch64-apple-darwin,      lib: libwgpu_native.dylib }
-          - { rid: win-x86,   os: windows-latest, target: i686-pc-windows-msvc,      lib: wgpu_native.dll }
+          - { rid: win-x86,     os: windows-latest, target: i686-pc-windows-msvc,      lib: wgpu_native.dll }
+          # Add more as needed, e.g.:
           #   - { rid: linux-arm, os: ubuntu-latest,  target: armv7-unknown-linux-gnueabihf, lib: libwgpu_native.so, apt: gcc-arm-linux-gnueabihf, linker: arm-linux-gnueabihf-gcc }
 
     steps:
@@ -64,10 +65,19 @@ jobs:
           ref: ${{ inputs.wgpu_ref || 'trunk' }}
           submodules: recursive
 
-      - name: Install Rust + target
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
+
+      - name: Add target to the repo-pinned toolchain
+        # wgpu-native ships a rust-toolchain.toml pinning a specific channel, which overrides
+        # whatever dtolnay sets as the default. dtolnay's `targets:` adds the std to the default
+        # (stable) toolchain, but `cargo build` runs under the pinned one — so every CROSS target
+        # fails with "can't find crate for core/std" while native targets (which already ship
+        # their host std) build fine. Running rustup target add from the checkout dir resolves the
+        # pinned toolchain (via rust-toolchain.toml) and installs the cross std into it.
+        run: |
+          rustup show active-toolchain
+          rustup target add ${{ matrix.target }}
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2

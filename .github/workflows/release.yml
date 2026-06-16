@@ -61,7 +61,7 @@ jobs:
           merge-multiple: true    # reconstructs a single runtimes/ tree at the repo root
 
       - name: Show assembled runtimes/
-        run: find runtimes -type f | sort 
+        run: find runtimes -type f | sort
 
       # NOTE: pack compiles the project. Until the decompiled wrapper is green
       # (see BUILD-NOTES.md) this step will fail — that is expected; the pathway
