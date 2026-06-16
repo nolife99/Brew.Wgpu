@@ -1,12 +1,5 @@
 name: build-wgpu-native
 
-# Builds wgpu-native ("the big one" — full upstream) from source for every
-# supported desktop RID, then assembles a single zip whose root is the NuGet
-# native layout:  runtimes/<rid>/native/<lib>.
-#
-# The source repo/ref is configurable so this can build upstream gfx-rs/wgpu-native
-# OR your own vendored fork (e.g. the size-optimized / memory-hints build).
-
 on:
   workflow_dispatch:
     inputs:
@@ -34,11 +27,6 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  # Stripped, size-optimized build by default (see BUILD-NOTES "Size / stripped builds").
-  # Backends are OS-gated, so listing them all is fine — each RID only compiles its own.
-  # The glsl naga frontend is dropped (the wrapper exposes no GLSL input); spirv is KEPT
-  # because ShaderSource.FromSpirV* depends on it. For a full, fast build instead, set
-  # CARGO_BUILD_FLAGS="" and the CARGO_PROFILE_RELEASE_* vars back to cargo defaults.
   CARGO_BUILD_FLAGS: "--no-default-features --features wgsl,spirv,dx12,metal,vulkan,gles"
   CARGO_PROFILE_RELEASE_OPT_LEVEL: "z"        # smallest codegen ("s" trades a little size for runtime perf)
   CARGO_PROFILE_RELEASE_LTO: "fat"            # whole-program dead-code elimination
@@ -100,7 +88,11 @@ jobs:
       - name: Stage into runtimes/<rid>/native
         shell: bash
         run: |
-          dest="runtimes/${{ matrix.rid }}/native"
+          # upload-artifact stores paths relative to the dir it's given, so staging under
+          # a throwaway pkg/ wrapper and uploading pkg/ keeps the full
+          # runtimes/<rid>/native/<lib> path inside the artifact. Uploading runtimes/
+          # directly strips the runtimes/ prefix (which broke the package + release zips).
+          dest="pkg/runtimes/${{ matrix.rid }}/native"
           mkdir -p "$dest"
           cp "target/${{ matrix.target }}/release/${{ matrix.lib }}" "$dest/"
           ls -l "$dest"
@@ -109,7 +101,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: runtime-${{ matrix.rid }}
-          path: runtimes/
+          path: pkg/
           if-no-files-found: error
 
   package:
@@ -122,7 +114,7 @@ jobs:
         with:
           pattern: runtime-*
           path: staging
-          merge-multiple: true     # merges all runtimes/<rid>/... into a single runtimes/ tree
+          merge-multiple: true
 
       - name: Show assembled layout
         run: find staging -type f | sort
