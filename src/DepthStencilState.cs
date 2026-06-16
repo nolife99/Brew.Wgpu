@@ -16,7 +16,7 @@ public struct DepthStencilState
 
     public static DepthStencilState Depth(
       WGPUTextureFormat format,
-      WGPUCompareFunction compare = (WGPUCompareFunction)2,
+      WGPUCompareFunction compare = WGPUCompareFunction.Less,
       bool write = true)
     {
         return new DepthStencilState()

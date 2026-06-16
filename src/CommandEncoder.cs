@@ -199,8 +199,8 @@ public readonly struct CommandEncoder : IDisposable, IEquatable<CommandEncoder>
         {
             view = view.Handle,
             resolveTarget = (WGPUTextureViewImpl*)null,
-            loadOp = (WGPULoadOp)2,
-            storeOp = (WGPUStoreOp)1,
+            loadOp = WGPULoadOp.Clear,
+            storeOp = WGPUStoreOp.Store,
             clearValue = clearColor,
             depthSlice = uint.MaxValue
         };
@@ -288,12 +288,12 @@ public readonly struct CommandEncoder : IDisposable, IEquatable<CommandEncoder>
         WGPURenderPassDepthStencilAttachment stencilAttachment = new WGPURenderPassDepthStencilAttachment()
         {
             view = view.Handle,
-            depthLoadOp = hasDepth ? (WGPULoadOp)2 : (WGPULoadOp)0,
-            depthStoreOp = hasDepth ? (WGPUStoreOp)1 : (WGPUStoreOp)0,
+            depthLoadOp = hasDepth ? WGPULoadOp.Clear : WGPULoadOp.Undefined,
+            depthStoreOp = hasDepth ? WGPUStoreOp.Store : WGPUStoreOp.Undefined,
             depthClearValue = depth,
             depthReadOnly = 0,
-            stencilLoadOp = hasStencil ? (WGPULoadOp)2 : (WGPULoadOp)0,
-            stencilStoreOp = hasStencil ? (WGPUStoreOp)1 : (WGPUStoreOp)0,
+            stencilLoadOp = hasStencil ? WGPULoadOp.Clear : WGPULoadOp.Undefined,
+            stencilStoreOp = hasStencil ? WGPUStoreOp.Store : WGPUStoreOp.Undefined,
             stencilClearValue = stencil,
             stencilReadOnly = 0
         };

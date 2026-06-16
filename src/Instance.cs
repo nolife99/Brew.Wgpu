@@ -21,7 +21,7 @@ public sealed class Instance : IDisposable
     {
         if (descriptor.LogCallback != null)
         {
-            WGPU.wgpuSetLogLevel(descriptor.LogLevel == null ? (WGPULogLevel)(object)2 : descriptor.LogLevel);
+            WGPU.wgpuSetLogLevel(descriptor.LogLevel == null ? WGPULogLevel.Warn : descriptor.LogLevel);
             WGPU.wgpuSetLogCallback(descriptor.LogCallback, descriptor.LogUserdata);
         }
         WGPUInstanceImpl* instance;
@@ -31,7 +31,7 @@ public sealed class Instance : IDisposable
             {
                 chain = new WGPUChainedStruct()
                 {
-                    sType = (WGPUSType)196614 /*0x030006*/
+                    sType = (WGPUSType)WGPUNativeSType.WGPUSType_InstanceExtras
                 },
                 flags = (ulong)descriptor.Flags,
                 backends = (ulong)descriptor.Backends
@@ -66,7 +66,7 @@ public sealed class Instance : IDisposable
         };
         WGPU.wgpuInstanceRequestAdapter(this._handle, &__h1, new WGPURequestAdapterCallbackInfo()
         {
-            mode = (WGPUCallbackMode)2,
+            mode = WGPUCallbackMode.AllowProcessEvents,
             callback = &OnAdapter,
             userdata1 = Unsafe.AsPointer<Instance.AdapterCallbackResult>(ref adapterCallbackResult)
         });
@@ -87,7 +87,7 @@ public sealed class Instance : IDisposable
                 {
                     chain = new WGPUChainedStruct()
                     {
-                        sType = (WGPUSType)5
+                        sType = WGPUSType.SurfaceSourceWindowsHWND
                     },
                     hinstance = (void*)source.Handle0,
                     hwnd = (void*)source.Handle1
@@ -103,7 +103,7 @@ public sealed class Instance : IDisposable
                 {
                     chain = new WGPUChainedStruct()
                     {
-                        sType = (WGPUSType)6
+                        sType = WGPUSType.SurfaceSourceXlibWindow
                     },
                     display = (void*)source.Handle0,
                     window = (ulong)(long)source.Handle1
@@ -119,7 +119,7 @@ public sealed class Instance : IDisposable
                 {
                     chain = new WGPUChainedStruct()
                     {
-                        sType = (WGPUSType)7
+                        sType = WGPUSType.SurfaceSourceWaylandSurface
                     },
                     display = (void*)source.Handle0,
                     surface = (void*)source.Handle1
@@ -135,7 +135,7 @@ public sealed class Instance : IDisposable
                 {
                     chain = new WGPUChainedStruct()
                     {
-                        sType = (WGPUSType)4
+                        sType = WGPUSType.SurfaceSourceMetalLayer
                     },
                     layer = (void*)source.Handle0
                 };
@@ -150,7 +150,7 @@ public sealed class Instance : IDisposable
                 {
                     chain = new WGPUChainedStruct()
                     {
-                        sType = (WGPUSType)8
+                        sType = WGPUSType.SurfaceSourceAndroidNativeWindow
                     },
                     window = (void*)source.Handle0
                 };

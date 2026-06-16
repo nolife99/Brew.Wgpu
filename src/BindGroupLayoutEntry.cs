@@ -23,7 +23,7 @@ public struct BindGroupLayoutEntry
     public static BindGroupLayoutEntry Buffer(
       uint binding,
       ShaderStage visibility,
-      WGPUBufferBindingType bufferType = (WGPUBufferBindingType)2,
+      WGPUBufferBindingType bufferType = WGPUBufferBindingType.Uniform,
       bool hasDynamicOffset = false,
       ulong minBindingSize = 0)
     {
@@ -45,13 +45,13 @@ public struct BindGroupLayoutEntry
       bool hasDynamicOffset = false,
       ulong minBindingSize = 0)
     {
-        return BindGroupLayoutEntry.Buffer(binding, visibility, readOnly ? (WGPUBufferBindingType)4 : (WGPUBufferBindingType)3, hasDynamicOffset, minBindingSize);
+        return BindGroupLayoutEntry.Buffer(binding, visibility, readOnly ? WGPUBufferBindingType.ReadOnlyStorage : WGPUBufferBindingType.Storage, hasDynamicOffset, minBindingSize);
     }
 
     public static BindGroupLayoutEntry Sampler(
       uint binding,
       ShaderStage visibility,
-      WGPUSamplerBindingType samplerType = (WGPUSamplerBindingType)2)
+      WGPUSamplerBindingType samplerType = WGPUSamplerBindingType.Filtering)
     {
         return new BindGroupLayoutEntry()
         {
@@ -65,8 +65,8 @@ public struct BindGroupLayoutEntry
     public static BindGroupLayoutEntry Texture(
       uint binding,
       ShaderStage visibility,
-      WGPUTextureSampleType sampleType = (WGPUTextureSampleType)2,
-      WGPUTextureViewDimension viewDimension = (WGPUTextureViewDimension)2,
+      WGPUTextureSampleType sampleType = WGPUTextureSampleType.Float,
+      WGPUTextureViewDimension viewDimension = WGPUTextureViewDimension._2D,
       bool multisampled = false)
     {
         return new BindGroupLayoutEntry()
@@ -84,8 +84,8 @@ public struct BindGroupLayoutEntry
       uint binding,
       ShaderStage visibility,
       WGPUTextureFormat format,
-      WGPUStorageTextureAccess access = (WGPUStorageTextureAccess)2,
-      WGPUTextureViewDimension viewDimension = (WGPUTextureViewDimension)2)
+      WGPUStorageTextureAccess access = WGPUStorageTextureAccess.WriteOnly,
+      WGPUTextureViewDimension viewDimension = WGPUTextureViewDimension._2D)
     {
         return new BindGroupLayoutEntry()
         {

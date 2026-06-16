@@ -32,7 +32,7 @@ public sealed class Adapter : IDisposable
         };
         WGPURequestDeviceCallbackInfo deviceCallbackInfo = new WGPURequestDeviceCallbackInfo()
         {
-            mode = (WGPUCallbackMode)2,
+            mode = WGPUCallbackMode.AllowProcessEvents,
             callback = &OnDevice,
             userdata1 = Unsafe.AsPointer<Adapter.DeviceCallbackResult>(ref deviceCallbackResult)
         };
@@ -55,7 +55,7 @@ public sealed class Adapter : IDisposable
                     ref WGPUNativeLimits local = ref valueOrDefault2;
                     WGPUChainedStruct wgpuChainedStruct = new WGPUChainedStruct()
                     {
-                        sType = (WGPUSType)196610 /*0x030002*/
+                        sType = (WGPUSType)WGPUNativeSType.WGPUSType_NativeLimits
                     };
                     local.chain = wgpuChainedStruct;
                     valueOrDefault1.nextInChain = (WGPUChainedStruct*)&valueOrDefault2;
@@ -218,7 +218,7 @@ public sealed class Adapter : IDisposable
         {
             chain = new WGPUChainedStruct()
             {
-                sType = (WGPUSType)196610 /*0x030002*/
+                sType = (WGPUSType)WGPUNativeSType.WGPUSType_NativeLimits
             }
         };
         var __h0 = new WGPULimits()

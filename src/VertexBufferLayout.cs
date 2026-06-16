@@ -6,7 +6,7 @@ namespace Brew.Wgpu;
 public struct VertexBufferLayout(
     ulong arrayStride,
     int attributeCount,
-    WGPUVertexStepMode stepMode = (WGPUVertexStepMode)1)
+    WGPUVertexStepMode stepMode = WGPUVertexStepMode.Vertex)
 {
     public ulong ArrayStride = arrayStride;
     public WGPUVertexStepMode StepMode = stepMode;

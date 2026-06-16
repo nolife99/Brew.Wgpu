@@ -17,9 +17,9 @@ public struct PrimitiveState
         {
             return new PrimitiveState()
             {
-                Topology = (WGPUPrimitiveTopology)4,
-                FrontFace = (WGPUFrontFace)1,
-                CullMode = (WGPUCullMode)1
+                Topology = WGPUPrimitiveTopology.TriangleList,
+                FrontFace = WGPUFrontFace.CCW,
+                CullMode = WGPUCullMode.None
             };
         }
     }

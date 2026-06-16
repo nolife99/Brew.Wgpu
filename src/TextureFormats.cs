@@ -330,13 +330,13 @@ public static class TextureFormats
             {
                 if ((int)f == 28)
                 {
-                    wgpuTextureFormat = (WGPUTextureFormat)27;
+                    wgpuTextureFormat = WGPUTextureFormat.BGRA8Unorm;
                     goto label_30;
                 }
             }
             else
             {
-                wgpuTextureFormat = (WGPUTextureFormat)22;
+                wgpuTextureFormat = WGPUTextureFormat.RGBA8Unorm;
                 goto label_30;
             }
         }
@@ -345,80 +345,80 @@ public static class TextureFormats
             switch (((int)f - 51))
             {
                 case 0:
-                    wgpuTextureFormat = (WGPUTextureFormat)50;
+                    wgpuTextureFormat = WGPUTextureFormat.BC1RGBAUnorm;
                     goto label_30;
                 case 1:
                 case 3:
                     break;
                 case 2:
-                    wgpuTextureFormat = (WGPUTextureFormat)52;
+                    wgpuTextureFormat = WGPUTextureFormat.BC2RGBAUnorm;
                     goto label_30;
                 case 4:
-                    wgpuTextureFormat = (WGPUTextureFormat)54;
+                    wgpuTextureFormat = WGPUTextureFormat.BC3RGBAUnorm;
                     goto label_30;
                 default:
                     switch (((int)f - 63) /*0x3F*/)
                     {
                         case 0:
-                            wgpuTextureFormat = (WGPUTextureFormat)62;
+                            wgpuTextureFormat = WGPUTextureFormat.BC7RGBAUnorm;
                             goto label_30;
                         case 1:
                         case 3:
                         case 5:
                             break;
                         case 2:
-                            wgpuTextureFormat = (WGPUTextureFormat)64 /*0x40*/;
+                            wgpuTextureFormat = WGPUTextureFormat.ETC2RGB8Unorm;
                             goto label_30;
                         case 4:
-                            wgpuTextureFormat = (WGPUTextureFormat)66;
+                            wgpuTextureFormat = WGPUTextureFormat.ETC2RGB8A1Unorm;
                             goto label_30;
                         case 6:
-                            wgpuTextureFormat = (WGPUTextureFormat)68;
+                            wgpuTextureFormat = WGPUTextureFormat.ETC2RGBA8Unorm;
                             goto label_30;
                         default:
                             switch (((int)f - 75))
                             {
                                 case 0:
-                                    wgpuTextureFormat = (WGPUTextureFormat)74;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC4x4Unorm;
                                     goto label_30;
                                 case 2:
-                                    wgpuTextureFormat = (WGPUTextureFormat)76;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC5x4Unorm;
                                     goto label_30;
                                 case 4:
-                                    wgpuTextureFormat = (WGPUTextureFormat)78;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC5x5Unorm;
                                     goto label_30;
                                 case 6:
-                                    wgpuTextureFormat = (WGPUTextureFormat)80 /*0x50*/;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC6x5Unorm;
                                     goto label_30;
                                 case 8:
-                                    wgpuTextureFormat = (WGPUTextureFormat)82;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC6x6Unorm;
                                     goto label_30;
                                 case 10:
-                                    wgpuTextureFormat = (WGPUTextureFormat)84;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC8x5Unorm;
                                     goto label_30;
                                 case 12:
-                                    wgpuTextureFormat = (WGPUTextureFormat)86;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC8x6Unorm;
                                     goto label_30;
                                 case 14:
-                                    wgpuTextureFormat = (WGPUTextureFormat)88;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC8x8Unorm;
                                     goto label_30;
                                 case 16 /*0x10*/:
-                                    wgpuTextureFormat = (WGPUTextureFormat)90;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC10x5Unorm;
                                     goto label_30;
                                 case 18:
-                                    wgpuTextureFormat = (WGPUTextureFormat)92;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC10x6Unorm;
                                     goto label_30;
                                 case 20:
-                                    wgpuTextureFormat = (WGPUTextureFormat)94;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC10x8Unorm;
                                     goto label_30;
                                 case 22:
-                                    wgpuTextureFormat = (WGPUTextureFormat)96 /*0x60*/;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC10x10Unorm;
                                     goto label_30;
                                 case 24:
-                                    wgpuTextureFormat = (WGPUTextureFormat)98;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC12x10Unorm;
                                     goto label_30;
                                 case 26:
-                                    wgpuTextureFormat = (WGPUTextureFormat)100;
+                                    wgpuTextureFormat = WGPUTextureFormat.ASTC12x12Unorm;
                                     goto label_30;
                             }
                             break;
@@ -426,7 +426,7 @@ public static class TextureFormats
                     break;
             }
         }
-        wgpuTextureFormat = (WGPUTextureFormat)0;
+        wgpuTextureFormat = WGPUTextureFormat.Undefined;
     label_30:
         linear = wgpuTextureFormat;
         return (int)linear != 0;
@@ -439,7 +439,7 @@ public static class TextureFormats
         switch ((int)f)
         {
             case 0:
-                textureSampleType = (WGPUTextureSampleType)1;
+                textureSampleType = WGPUTextureSampleType.Undefined;
                 break;
             case 3:
             case 7:
@@ -452,7 +452,7 @@ public static class TextureFormats
             case 38:
             case 42:
             case 44:
-                textureSampleType = (WGPUTextureSampleType)6;
+                textureSampleType = WGPUTextureSampleType.Uint;
                 break;
             case 4:
             case 8:
@@ -463,22 +463,22 @@ public static class TextureFormats
             case 35:
             case 39:
             case 43:
-                textureSampleType = (WGPUTextureSampleType)5;
+                textureSampleType = WGPUTextureSampleType.Sint;
                 break;
             case 14:
             case 33:
             case 41:
-                textureSampleType = (WGPUTextureSampleType)3;
+                textureSampleType = WGPUTextureSampleType.UnfilterableFloat;
                 break;
             case 45:
             case 46:
             case 47:
             case 48 /*0x30*/:
             case 49:
-                textureSampleType = (WGPUTextureSampleType)4;
+                textureSampleType = WGPUTextureSampleType.Depth;
                 break;
             default:
-                textureSampleType = (WGPUTextureSampleType)2;
+                textureSampleType = WGPUTextureSampleType.Float;
                 break;
         }
         return textureSampleType;

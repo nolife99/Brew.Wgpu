@@ -18,12 +18,12 @@ public struct DepthStencilAttachment
     public static DepthStencilAttachment DepthClear(
       TextureView view,
       float clearValue = 1f,
-      WGPUStoreOp storeOp = (WGPUStoreOp)1)
+      WGPUStoreOp storeOp = WGPUStoreOp.Store)
     {
         return new DepthStencilAttachment()
         {
             View = view,
-            DepthLoadOp = (WGPULoadOp)2,
+            DepthLoadOp = WGPULoadOp.Clear,
             DepthStoreOp = storeOp,
             DepthClearValue = clearValue
         };

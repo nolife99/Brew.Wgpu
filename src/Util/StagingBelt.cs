@@ -91,7 +91,7 @@ public sealed class StagingBelt : IDisposable
       scoped ReadOnlySpan<byte> packedData,
       uint mipLevel = 0,
       WGPUOrigin3D origin = default(WGPUOrigin3D),
-      WGPUTextureAspect aspect = (WGPUTextureAspect)1)
+      WGPUTextureAspect aspect = WGPUTextureAspect.All)
     {
         this.ThrowIfDisposed();
         if (target.IsNull)

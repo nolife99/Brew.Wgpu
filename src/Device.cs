@@ -85,7 +85,7 @@ public sealed class Device : IDisposable
                     ref WGPUShaderSourceWGSL local1 = ref shaderSourceWgsl1;
                     WGPUChainedStruct wgpuChainedStruct1 = new WGPUChainedStruct()
                     {
-                        sType = (WGPUSType)2
+                        sType = WGPUSType.ShaderSourceWGSL
                     };
                     local1.chain = wgpuChainedStruct1;
                     ref WGPUShaderSourceWGSL local2 = ref shaderSourceWgsl1;
@@ -108,7 +108,7 @@ public sealed class Device : IDisposable
                     ref WGPUShaderSourceSPIRV local3 = ref shaderSourceSpirv1;
                     WGPUChainedStruct wgpuChainedStruct2 = new WGPUChainedStruct()
                     {
-                        sType = (WGPUSType)1
+                        sType = WGPUSType.ShaderSourceSPIRV
                     };
                     local3.chain = wgpuChainedStruct2;
                     shaderSourceSpirv1.codeSize = (uint)(desc.Source.Bytes.Length / 4);
@@ -269,7 +269,7 @@ public sealed class Device : IDisposable
                 {
                     chain = new WGPUChainedStruct()
                     {
-                        sType = (WGPUSType)196616 /*0x030008*/
+                        sType = (WGPUSType)WGPUNativeSType.WGPUSType_BindGroupLayoutEntryExtras
                     },
                     count = local.ArraySize
                 };
@@ -371,7 +371,7 @@ public sealed class Device : IDisposable
                 ref WGPUBindGroupEntryExtras local1 = ref groupEntryExtras2;
                 WGPUChainedStruct wgpuChainedStruct = new WGPUChainedStruct()
                 {
-                    sType = (WGPUSType)196615 /*0x030007*/
+                    sType = (WGPUSType)WGPUNativeSType.WGPUSType_BindGroupEntryExtras
                 };
                 local1.chain = wgpuChainedStruct;
                 groupEntryExtras2.textureViews = viewPtrs;
@@ -407,7 +407,7 @@ public sealed class Device : IDisposable
       MultisampleState multisample = default(MultisampleState),
       in DepthStencilState depthStencil = default(DepthStencilState),
       ulong vertexStride = 0,
-      WGPUVertexStepMode vertexStepMode = (WGPUVertexStepMode)0,
+      WGPUVertexStepMode vertexStepMode = WGPUVertexStepMode.Undefined,
       scoped ReadOnlySpan<VertexAttribute> vertexAttributes = default(ReadOnlySpan<VertexAttribute>))
     {
         if (primitive.Topology == null)
@@ -455,15 +455,15 @@ public sealed class Device : IDisposable
         {
             WGPUStencilFaceState stencilFaceState = new WGPUStencilFaceState()
             {
-                compare = (WGPUCompareFunction)0,
-                failOp = (WGPUStencilOperation)0,
-                depthFailOp = (WGPUStencilOperation)0,
-                passOp = (WGPUStencilOperation)0
+                compare = WGPUCompareFunction.Undefined,
+                failOp = WGPUStencilOperation.Undefined,
+                depthFailOp = WGPUStencilOperation.Undefined,
+                passOp = WGPUStencilOperation.Undefined
             };
             depthStencilState = new WGPUDepthStencilState()
             {
                 format = depthStencil.Format,
-                depthWriteEnabled = depthStencil.DepthWriteEnabled ? (WGPUOptionalBool)1 : (WGPUOptionalBool)0,
+                depthWriteEnabled = depthStencil.DepthWriteEnabled ? WGPUOptionalBool.True : WGPUOptionalBool.False,
                 depthCompare = depthStencil.DepthCompare,
                 stencilFront = stencilFaceState,
                 stencilBack = stencilFaceState,
@@ -481,7 +481,7 @@ public sealed class Device : IDisposable
         {
             WGPUVertexBufferLayout vertexBufferLayout = new WGPUVertexBufferLayout()
             {
-                stepMode = vertexStepMode == null ? (WGPUVertexStepMode)(object)1 : vertexStepMode,
+                stepMode = vertexStepMode == null ? WGPUVertexStepMode.Vertex : vertexStepMode,
                 arrayStride = vertexStride,
                 attributeCount = (UIntPtr)length2,
                 attributes = wgpuVertexAttributePtr
@@ -591,15 +591,15 @@ public sealed class Device : IDisposable
         {
             WGPUStencilFaceState stencilFaceState = new WGPUStencilFaceState()
             {
-                compare = (WGPUCompareFunction)0,
-                failOp = (WGPUStencilOperation)0,
-                depthFailOp = (WGPUStencilOperation)0,
-                passOp = (WGPUStencilOperation)0
+                compare = WGPUCompareFunction.Undefined,
+                failOp = WGPUStencilOperation.Undefined,
+                depthFailOp = WGPUStencilOperation.Undefined,
+                passOp = WGPUStencilOperation.Undefined
             };
             depthStencilState = new WGPUDepthStencilState()
             {
                 format = depthStencil.Format,
-                depthWriteEnabled = depthStencil.DepthWriteEnabled ? (WGPUOptionalBool)1 : (WGPUOptionalBool)0,
+                depthWriteEnabled = depthStencil.DepthWriteEnabled ? WGPUOptionalBool.True : WGPUOptionalBool.False,
                 depthCompare = depthStencil.DepthCompare,
                 stencilFront = stencilFaceState,
                 stencilBack = stencilFaceState,
@@ -636,7 +636,7 @@ public sealed class Device : IDisposable
                 WGPUVertexBufferLayout* vertexBufferLayoutPtr2 = vertexBufferLayoutPtr1 + index1;
                 WGPUVertexBufferLayout vertexBufferLayout = new WGPUVertexBufferLayout()
                 {
-                    stepMode = local1.StepMode == null ? (WGPUVertexStepMode)(object)1 : local1.StepMode,
+                    stepMode = local1.StepMode == null ? WGPUVertexStepMode.Vertex : local1.StepMode,
                     arrayStride = local1.ArrayStride,
                     attributeCount = (UIntPtr)attributeCount,
                     attributes = attributeCount > 0 ? wgpuVertexAttributePtr1 + num2 : (WGPUVertexAttribute*)null
@@ -703,7 +703,7 @@ public sealed class Device : IDisposable
       MultisampleState multisample = default(MultisampleState),
       in DepthStencilState depthStencil = default(DepthStencilState),
       ulong vertexStride = 0,
-      WGPUVertexStepMode vertexStepMode = (WGPUVertexStepMode)0,
+      WGPUVertexStepMode vertexStepMode = WGPUVertexStepMode.Undefined,
       scoped ReadOnlySpan<VertexAttribute> vertexAttributes = default(ReadOnlySpan<VertexAttribute>))
     {
         if (primitive.Topology == null)
@@ -731,7 +731,7 @@ public sealed class Device : IDisposable
         {
             WGPUVertexBufferLayout vertexBufferLayout = new WGPUVertexBufferLayout()
             {
-                stepMode = vertexStepMode == null ? (WGPUVertexStepMode)(object)1 : vertexStepMode,
+                stepMode = vertexStepMode == null ? WGPUVertexStepMode.Vertex : vertexStepMode,
                 arrayStride = vertexStride,
                 attributeCount = (UIntPtr)length,
                 attributes = wgpuVertexAttributePtr
@@ -811,7 +811,7 @@ public sealed class Device : IDisposable
                 WGPUVertexBufferLayout* vertexBufferLayoutPtr2 = vertexBufferLayoutPtr1 + index1;
                 WGPUVertexBufferLayout vertexBufferLayout = new WGPUVertexBufferLayout()
                 {
-                    stepMode = local1.StepMode == null ? (WGPUVertexStepMode)(object)1 : local1.StepMode,
+                    stepMode = local1.StepMode == null ? WGPUVertexStepMode.Vertex : local1.StepMode,
                     arrayStride = local1.ArrayStride,
                     attributeCount = (UIntPtr)attributeCount,
                     attributes = attributeCount > 0 ? wgpuVertexAttributePtr1 + num2 : (WGPUVertexAttribute*)null
@@ -848,15 +848,15 @@ public sealed class Device : IDisposable
     {
         WGPUStencilFaceState stencilFaceState = new WGPUStencilFaceState()
         {
-            compare = (WGPUCompareFunction)0,
-            failOp = (WGPUStencilOperation)0,
-            depthFailOp = (WGPUStencilOperation)0,
-            passOp = (WGPUStencilOperation)0
+            compare = WGPUCompareFunction.Undefined,
+            failOp = WGPUStencilOperation.Undefined,
+            depthFailOp = WGPUStencilOperation.Undefined,
+            passOp = WGPUStencilOperation.Undefined
         };
         return new WGPUDepthStencilState()
         {
             format = ds.Format,
-            depthWriteEnabled = ds.DepthWriteEnabled ? (WGPUOptionalBool)1 : (WGPUOptionalBool)0,
+            depthWriteEnabled = ds.DepthWriteEnabled ? WGPUOptionalBool.True : WGPUOptionalBool.False,
             depthCompare = ds.DepthCompare,
             stencilFront = stencilFaceState,
             stencilBack = stencilFaceState,
