@@ -53,8 +53,7 @@ jobs:
           - { rid: linux-arm64, os: ubuntu-latest,  target: aarch64-unknown-linux-gnu, lib: libwgpu_native.so, apt: gcc-aarch64-linux-gnu, linker: aarch64-linux-gnu-gcc }
           - { rid: osx-x64,     os: macos-latest,   target: x86_64-apple-darwin,       lib: libwgpu_native.dylib }
           - { rid: osx-arm64,   os: macos-latest,   target: aarch64-apple-darwin,      lib: libwgpu_native.dylib }
-          # Add more as needed, e.g.:
-          #   - { rid: win-x86,   os: windows-latest, target: i686-pc-windows-msvc,      lib: wgpu_native.dll }
+          - { rid: win-x86,   os: windows-latest, target: i686-pc-windows-msvc,      lib: wgpu_native.dll }
           #   - { rid: linux-arm, os: ubuntu-latest,  target: armv7-unknown-linux-gnueabihf, lib: libwgpu_native.so, apt: gcc-arm-linux-gnueabihf, linker: arm-linux-gnueabihf-gcc }
 
     steps:
