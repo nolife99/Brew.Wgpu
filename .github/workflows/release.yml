@@ -28,6 +28,7 @@ jobs:
     with:
       wgpu_repo: ${{ inputs.wgpu_repo }}
       wgpu_ref: ${{ inputs.wgpu_ref }}
+
   publish:
     needs: native
     runs-on: ubuntu-latest
