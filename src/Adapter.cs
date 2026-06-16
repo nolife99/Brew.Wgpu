@@ -37,7 +37,8 @@ public sealed class Adapter : IDisposable
             userdata1 = Unsafe.AsPointer<Adapter.DeviceCallbackResult>(ref deviceCallbackResult)
         };
         bool flag = descriptor.RequiredLimits.HasValue || descriptor.RequiredNativeLimits.HasValue;
-        if (((descriptor.UncapturedErrorCallback != null ? 1 : (descriptor.RequiredFeatures.Length > 0 ? 1 : 0)) | (flag ? 1 : 0)) != 0)
+        bool hasDeviceExtras = descriptor.MemoryHint != WGPUNativeMemoryHint.Performance;
+        if (descriptor.UncapturedErrorCallback != null || descriptor.RequiredFeatures.Length > 0 || flag || hasDeviceExtras)
         {
             WGPUStringView wgpuStringView = new WGPUStringView()
             {
@@ -76,6 +77,15 @@ public sealed class Adapter : IDisposable
                     userdata1 = descriptor.UncapturedErrorUserdata
                 };
                 local2.uncapturedErrorCallbackInfo = errorCallbackInfo;
+
+                WGPUDeviceExtras deviceExtras = default;
+                if (hasDeviceExtras)
+                {
+                    deviceExtras.chain.sType = (WGPUSType)WGPUNativeSType.WGPUSType_DeviceExtras;
+                    deviceExtras.memoryHint = descriptor.MemoryHint;
+                    deviceDescriptor.nextInChain = (WGPUChainedStruct*)&deviceExtras;
+                }
+
                 WGPU.wgpuAdapterRequestDevice(this.Handle, &deviceDescriptor, deviceCallbackInfo);
             }
         }

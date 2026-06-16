@@ -11,4 +11,5 @@ public ref struct DeviceDescriptor
     public ReadOnlySpan<WGPUFeatureName> RequiredFeatures;
     public WGPULimits? RequiredLimits;
     public WGPUNativeLimits? RequiredNativeLimits;
+    public WGPUNativeMemoryHint MemoryHint;
 }

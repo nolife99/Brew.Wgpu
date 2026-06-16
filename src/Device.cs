@@ -303,16 +303,14 @@ public sealed class Device : IDisposable
       scoped ReadOnlySpan<BindGroupLayout> bindGroupLayouts,
       uint pushConstantBytes)
     {
-        if (pushConstantBytes > 0U)
-            throw new NotSupportedException(
-              "Push-constant pipeline layouts are not supported by this build of Brew.Wgpu.");
         ReadOnlySpan<IntPtr> readOnlySpan = MemoryMarshal.Cast<BindGroupLayout, IntPtr>(bindGroupLayouts);
         fixed (IntPtr* numPtr = &readOnlySpan.GetPinnableReference())
         {
             var __h7 = new WGPUPipelineLayoutDescriptor()
             {
                 bindGroupLayoutCount = (UIntPtr)readOnlySpan.Length,
-                bindGroupLayouts = (WGPUBindGroupLayoutImpl**)numPtr
+                bindGroupLayouts = (WGPUBindGroupLayoutImpl**)numPtr,
+                immediateSize = pushConstantBytes
             };
             WGPUPipelineLayoutImpl* pipelineLayout = WGPU.wgpuDeviceCreatePipelineLayout(this.Handle, &__h7);
             return (IntPtr)pipelineLayout != IntPtr.Zero ? new PipelineLayout(pipelineLayout) : throw new ResourceCreationException("PipelineLayout", "wgpuDeviceCreatePipelineLayout");
