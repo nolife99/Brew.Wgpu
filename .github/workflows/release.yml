@@ -24,6 +24,8 @@ permissions:
 
 jobs:
   native:
+    permissions:
+      contents: write
     uses: ./.github/workflows/build-wgpu-native.yml
     with:
       wgpu_repo: ${{ inputs.wgpu_repo }}
