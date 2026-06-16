@@ -23,7 +23,7 @@ on:
     tags: ["v*"]
 
 permissions:
-  contents: write        # needed to attach the zip to a release on tag pushes
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
@@ -108,13 +108,15 @@ jobs:
     name: package
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # only this job touches a release (the tag-push attach step)
     steps:
       - name: Download every per-RID artifact into one tree
         uses: actions/download-artifact@v4
         with:
           pattern: runtime-*
           path: staging
-          merge-multiple: true
+          merge-multiple: true     # merges all runtimes/<rid>/... into a single runtimes/ tree
 
       - name: Show assembled layout
         run: find staging -type f | sort
