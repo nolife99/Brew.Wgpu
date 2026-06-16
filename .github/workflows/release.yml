@@ -1,14 +1,5 @@
 name: release
 
-# Manually-triggered publish.
-#   1. builds wgpu-native for every RID (reuses build-wgpu-native.yml)
-#   2. packs Brew.Wgpu (managed assembly + bundled runtimes/<rid>/native/*)
-#   3. pushes the .nupkg (+ .snupkg) to nuget.org
-#
-# One-time prerequisite — add a repository secret named NUGET_API_KEY:
-#   Settings -> Secrets and variables -> Actions -> New repository secret
-#   Name: NUGET_API_KEY   Value: <your nuget.org API key>
-
 on:
   workflow_dispatch:
     inputs:
@@ -16,13 +7,13 @@ on:
         description: "Package version, e.g. 29.0.0  or  29.0.0-rc.1"
         required: true
       wgpu_repo:
-        description: "wgpu-native repo to build (use your fork to get the memory-hints build)"
+        description: "wgpu-native repo to build (defaults to the memory-hints fork; set gfx-rs/wgpu-native for a stock build without hints)"
         required: false
-        default: "gfx-rs/wgpu-native"
+        default: "nolife99/wgpu-native"
       wgpu_ref:
-        description: "git ref to build (tag / branch / sha)"
+        description: "git ref to build (tag / branch / sha) — pin to a tag for a reproducible release"
         required: false
-        default: "trunk"
+        default: "memory-hints"
       dry_run:
         description: "Pack only — do NOT push to nuget.org (use this to test packing)"
         type: boolean
@@ -32,16 +23,11 @@ permissions:
   contents: read
 
 jobs:
-  # 1) Native binaries for every RID. Reuses the standalone build workflow,
-  #    which uploads one artifact per RID named runtime-<rid> containing
-  #    runtimes/<rid>/native/<lib>.
   native:
     uses: ./.github/workflows/build-wgpu-native.yml
     with:
       wgpu_repo: ${{ inputs.wgpu_repo }}
       wgpu_ref: ${{ inputs.wgpu_ref }}
-
-  # 2) Pack the managed project together with the natives, then push.
   publish:
     needs: native
     runs-on: ubuntu-latest
@@ -63,9 +49,6 @@ jobs:
       - name: Show assembled runtimes/
         run: find runtimes -type f | sort
 
-      # NOTE: pack compiles the project. Until the decompiled wrapper is green
-      # (see BUILD-NOTES.md) this step will fail — that is expected; the pathway
-      # itself is complete. Use dry_run while finishing the wrapper.
       - name: Pack
         run: dotnet pack Brew.Wgpu.csproj -c Release -p:Version="${{ inputs.version }}" -o artifacts
 

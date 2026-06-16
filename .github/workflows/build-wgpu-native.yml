@@ -11,21 +11,21 @@ on:
   workflow_dispatch:
     inputs:
       wgpu_repo:
-        description: "wgpu-native git repository to build"
-        default: "gfx-rs/wgpu-native"
+        description: "wgpu-native git repository to build (defaults to the memory-hints fork; set gfx-rs/wgpu-native for stock upstream)"
+        default: "nolife99/wgpu-native"
       wgpu_ref:
-        description: "git ref to build (tag / branch / sha)"
-        default: "trunk"
+        description: "git ref to build (tag / branch / sha) — pin to a tag for reproducible release builds"
+        default: "memory-hints"
   workflow_call:
     inputs:
       wgpu_repo:
         type: string
         required: false
-        default: "gfx-rs/wgpu-native"
+        default: "nolife99/wgpu-native"
       wgpu_ref:
         type: string
         required: false
-        default: "trunk"
+        default: "memory-hints"
   push:
     tags: ["v*"]
 
@@ -34,10 +34,18 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  # Default = full upstream build. To produce a trimmed build instead, set e.g.
-  #   CARGO_BUILD_FLAGS: "--no-default-features --features wgsl,vulkan,dx12,metal,gles"
-  # and add a [profile.release] (lto/opt-level/strip/panic=abort) in the fork.
-  CARGO_BUILD_FLAGS: ""
+  # Stripped, size-optimized build by default (see BUILD-NOTES "Size / stripped builds").
+  # Backends are OS-gated, so listing them all is fine — each RID only compiles its own.
+  # The glsl naga frontend is dropped (the wrapper exposes no GLSL input); spirv is KEPT
+  # because ShaderSource.FromSpirV* depends on it. For a full, fast build instead, set
+  # CARGO_BUILD_FLAGS="" and the CARGO_PROFILE_RELEASE_* vars back to cargo defaults.
+  CARGO_BUILD_FLAGS: "--no-default-features --features wgsl,spirv,dx12,metal,vulkan,gles"
+  CARGO_PROFILE_RELEASE_OPT_LEVEL: "z"        # smallest codegen ("s" trades a little size for runtime perf)
+  CARGO_PROFILE_RELEASE_LTO: "fat"            # whole-program dead-code elimination
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "1"    # single unit => better DCE/inlining, smaller output
+  CARGO_PROFILE_RELEASE_PANIC: "abort"        # drop unwind tables; also avoids UB if a panic reaches the C ABI
+  CARGO_PROFILE_RELEASE_STRIP: "symbols"      # strip the symbol table (the exported C ABI stays intact)
+  CARGO_PROFILE_RELEASE_DEBUG: "false"        # no debuginfo
 
 jobs:
   build:
@@ -53,28 +61,21 @@ jobs:
           - { rid: linux-arm64, os: ubuntu-latest,  target: aarch64-unknown-linux-gnu, lib: libwgpu_native.so, apt: gcc-aarch64-linux-gnu, linker: aarch64-linux-gnu-gcc }
           - { rid: osx-x64,     os: macos-latest,   target: x86_64-apple-darwin,       lib: libwgpu_native.dylib }
           - { rid: osx-arm64,   os: macos-latest,   target: aarch64-apple-darwin,      lib: libwgpu_native.dylib }
-          - { rid: win-x86,     os: windows-latest, target: i686-pc-windows-msvc,      lib: wgpu_native.dll }
-          # Add more as needed, e.g.:
+          - { rid: win-x86,   os: windows-latest, target: i686-pc-windows-msvc,      lib: wgpu_native.dll }
           #   - { rid: linux-arm, os: ubuntu-latest,  target: armv7-unknown-linux-gnueabihf, lib: libwgpu_native.so, apt: gcc-arm-linux-gnueabihf, linker: arm-linux-gnueabihf-gcc }
 
     steps:
       - name: Checkout wgpu-native
         uses: actions/checkout@v4
         with:
-          repository: ${{ inputs.wgpu_repo || 'gfx-rs/wgpu-native' }}
-          ref: ${{ inputs.wgpu_ref || 'trunk' }}
+          repository: ${{ inputs.wgpu_repo || 'nolife99/wgpu-native' }}
+          ref: ${{ inputs.wgpu_ref || 'memory-hints' }}
           submodules: recursive
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Add target to the repo-pinned toolchain
-        # wgpu-native ships a rust-toolchain.toml pinning a specific channel, which overrides
-        # whatever dtolnay sets as the default. dtolnay's `targets:` adds the std to the default
-        # (stable) toolchain, but `cargo build` runs under the pinned one — so every CROSS target
-        # fails with "can't find crate for core/std" while native targets (which already ship
-        # their host std) build fine. Running rustup target add from the checkout dir resolves the
-        # pinned toolchain (via rust-toolchain.toml) and installs the cross std into it.
         run: |
           rustup show active-toolchain
           rustup target add ${{ matrix.target }}
