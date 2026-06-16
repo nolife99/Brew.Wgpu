@@ -37,7 +37,7 @@ env:
   # Default = full upstream build. To produce a trimmed build instead, set e.g.
   #   CARGO_BUILD_FLAGS: "--no-default-features --features wgsl,vulkan,dx12,metal,gles"
   # and add a [profile.release] (lto/opt-level/strip/panic=abort) in the fork.
-  CARGO_BUILD_FLAGS: ""
+  CARGO_BUILD_FLAGS: "" 
 
 jobs:
   build:
