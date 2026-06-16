@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!-- also produces correct types on win-x86 (uint64_t->ulong, size_t->nuint),
+       so a 32-bit RID can be added to the native matrix without code changes. -->
+
+  <!-- ============ NuGet package identity ============ -->
+  <PropertyGroup>
+    <PackageId>Brew.Wgpu</PackageId>
+    <AssemblyName>Brew.Wgpu</AssemblyName>
+    <RootNamespace>Brew.Wgpu</RootNamespace>
+    <Version>0.0.0-dev</Version> <!-- overridden by the release workflow (-p:Version) -->
+    <Authors>nolife99</Authors>
+    <Description>Pure-managed C# bindings for wgpu-native (WebGPU), with bundled native runtimes. DllImport("wgpu_native") resolves the right runtimes/&lt;rid&gt;/native library at run time, so consumers need no native build step.
+
+Derived from Ahjo.Wgpu — Copyright (c) Pekka Heikura. Bundled native binaries are from gfx-rs/wgpu-native, licensed MIT OR Apache-2.0.</Description>
+    <Copyright>Copyright (c) nolife99. Based on Ahjo.Wgpu, Copyright (c) Pekka Heikura.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/nolife99/Brew.Wgpu</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nolife99/Brew.Wgpu</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>wgpu;wgpu-native;webgpu;gpu;graphics;vulkan;metal;dx12;bindings;native;cross-platform</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- Pack the native binaries (assembled into runtimes/ by CI) + docs/notices. -->
+  <ItemGroup>
+    <None Include="runtimes/**" Pack="true" PackagePath="runtimes/" />
+    <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('README.md')" />
+    <None Include="THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Condition="Exists('THIRD-PARTY-NOTICES.txt')" />
+  </ItemGroup>
+
+  <!-- Local dev (F5): copy this machine's RID natives next to build output. -->
+  <Target Name="CopyLocalNative" AfterTargets="Build" Condition="'$(RuntimeIdentifier)' != '' And Exists('runtimes/$(RuntimeIdentifier)/native')">
+    <ItemGroup>
+      <_LocalNative Include="runtimes/$(RuntimeIdentifier)/native/**/*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_LocalNative)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

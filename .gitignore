@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+*.user
+artifacts/
+# Native binaries are assembled by CI into runtimes/ at publish time.
+runtimes/

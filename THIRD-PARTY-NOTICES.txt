@@ -1,0 +1,20 @@
+Brew.Wgpu — Third-Party Notices
+================================
+
+This package builds on the following projects.
+
+1) Ahjo.Wgpu
+   Copyright (c) Pekka Heikura
+   License: MIT
+   The managed C# wrapper in this package is derived from Ahjo.Wgpu.
+
+2) wgpu-native  (https://github.com/gfx-rs/wgpu-native)
+   Copyright (c) The gfx-rs developers
+   License: MIT OR Apache-2.0
+   The native binaries shipped under runtimes/<rid>/native/ are builds of
+   wgpu-native. The raw P/Invoke bindings were generated from its C headers.
+
+3) ClangSharp  (https://github.com/dotnet/ClangSharp)
+   Copyright (c) .NET Foundation and Contributors
+   License: MIT
+   Used at development time to generate the bindings; not redistributed here.

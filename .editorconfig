@@ -1,0 +1,46 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+[*.cs]
+indent_size = 4
+
+# --- usings ---
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+csharp_using_directive_placement = outside_namespace:warning
+
+# --- namespaces / files ---
+csharp_style_namespace_declarations = file_scoped:warning
+
+# --- 'this.' qualification: ILSpy emits it everywhere; strip it ---
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# --- prefer language keywords over BCL names (int, not Int32; nuint not UIntPtr) ---
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_predefined_type_for_member_access = true:warning
+
+# --- var / modern expression style ---
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_prefer_braces = true:suggestion
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_style_throw_expression = true:suggestion
+
+# --- naming: ILSpy locals like 'num1','flag' are legal; leave to manual cleanup ---
+# (kept lenient on purpose so `dotnet format` doesn't churn local names)
+
+# Raw generated bindings: do not fight ClangSharp's chosen names/casing.
+[src/Native/**.cs]
+dotnet_diagnostic.IDE1006.severity = none
+dotnet_style_qualification_for_field = false:silent

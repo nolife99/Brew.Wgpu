@@ -1,0 +1,139 @@
+name: build-wgpu-native
+
+# Builds wgpu-native ("the big one" — full upstream) from source for every
+# supported desktop RID, then assembles a single zip whose root is the NuGet
+# native layout:  runtimes/<rid>/native/<lib>.
+#
+# The source repo/ref is configurable so this can build upstream gfx-rs/wgpu-native
+# OR your own vendored fork (e.g. the size-optimized / memory-hints build).
+
+on:
+  workflow_dispatch:
+    inputs:
+      wgpu_repo:
+        description: "wgpu-native git repository to build"
+        default: "gfx-rs/wgpu-native"
+      wgpu_ref:
+        description: "git ref to build (tag / branch / sha)"
+        default: "trunk"
+  workflow_call:
+    inputs:
+      wgpu_repo:
+        type: string
+        required: false
+        default: "gfx-rs/wgpu-native"
+      wgpu_ref:
+        type: string
+        required: false
+        default: "trunk"
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write        # needed to attach the zip to a release on tag pushes
+
+env:
+  CARGO_TERM_COLOR: always
+  # Default = full upstream build. To produce a trimmed build instead, set e.g.
+  #   CARGO_BUILD_FLAGS: "--no-default-features --features wgsl,vulkan,dx12,metal,gles"
+  # and add a [profile.release] (lto/opt-level/strip/panic=abort) in the fork.
+  CARGO_BUILD_FLAGS: ""
+
+jobs:
+  build:
+    name: ${{ matrix.rid }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { rid: win-x64,     os: windows-latest, target: x86_64-pc-windows-msvc,    lib: wgpu_native.dll }
+          - { rid: win-arm64,   os: windows-latest, target: aarch64-pc-windows-msvc,   lib: wgpu_native.dll }
+          - { rid: linux-x64,   os: ubuntu-latest,  target: x86_64-unknown-linux-gnu,  lib: libwgpu_native.so }
+          - { rid: linux-arm64, os: ubuntu-latest,  target: aarch64-unknown-linux-gnu, lib: libwgpu_native.so, apt: gcc-aarch64-linux-gnu, linker: aarch64-linux-gnu-gcc }
+          - { rid: osx-x64,     os: macos-latest,   target: x86_64-apple-darwin,       lib: libwgpu_native.dylib }
+          - { rid: osx-arm64,   os: macos-latest,   target: aarch64-apple-darwin,      lib: libwgpu_native.dylib }
+          # Add more as needed, e.g.:
+          #   - { rid: win-x86,   os: windows-latest, target: i686-pc-windows-msvc,      lib: wgpu_native.dll }
+          #   - { rid: linux-arm, os: ubuntu-latest,  target: armv7-unknown-linux-gnueabihf, lib: libwgpu_native.so, apt: gcc-arm-linux-gnueabihf, linker: arm-linux-gnueabihf-gcc }
+
+    steps:
+      - name: Checkout wgpu-native
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.wgpu_repo || 'gfx-rs/wgpu-native' }}
+          ref: ${{ inputs.wgpu_ref || 'trunk' }}
+          submodules: recursive
+
+      - name: Install Rust + target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Install cross linker (Linux non-native arch)
+        if: matrix.apt != ''
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.apt }}
+          # cargo reads CARGO_TARGET_<TRIPLE>_LINKER (triple upper-cased, - -> _)
+          var="CARGO_TARGET_$(echo '${{ matrix.target }}' | tr 'a-z-' 'A-Z_')_LINKER"
+          echo "$var=${{ matrix.linker }}" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }} ${{ env.CARGO_BUILD_FLAGS }}
+
+      - name: Stage into runtimes/<rid>/native
+        shell: bash
+        run: |
+          dest="runtimes/${{ matrix.rid }}/native"
+          mkdir -p "$dest"
+          cp "target/${{ matrix.target }}/release/${{ matrix.lib }}" "$dest/"
+          ls -l "$dest"
+
+      - name: Upload per-RID artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-${{ matrix.rid }}
+          path: runtimes/
+          if-no-files-found: error
+
+  package:
+    name: package
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download every per-RID artifact into one tree
+        uses: actions/download-artifact@v4
+        with:
+          pattern: runtime-*
+          path: staging
+          merge-multiple: true     # merges all runtimes/<rid>/... into a single runtimes/ tree
+
+      - name: Show assembled layout
+        run: find staging -type f | sort
+
+      - name: Zip with runtimes/ at the archive root
+        run: |
+          cd staging
+          zip -r ../wgpu-native-runtimes.zip runtimes
+          cd ..
+          echo "=== archive contents ==="
+          unzip -l wgpu-native-runtimes.zip
+
+      - name: Upload the single zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: wgpu-native-runtimes
+          path: wgpu-native-runtimes.zip
+          if-no-files-found: error
+
+      - name: Attach to release (tag pushes only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: wgpu-native-runtimes.zip
