@@ -12,4 +12,6 @@ public ref struct DeviceDescriptor
     public WGPULimits? RequiredLimits;
     public WGPUNativeLimits? RequiredNativeLimits;
     public WGPUNativeMemoryHint MemoryHint;
+    public ulong SuballocatedBlockSizeMin;
+    public ulong SuballocatedBlockSizeMax;
 }
