@@ -32,12 +32,12 @@ public sealed class MipmapGenerator : IDisposable
 
         _sampler = device.CreateSampler(new SamplerDescriptor
         {
-            AddressModeU = WGPUAddressMode.WGPUAddressMode_ClampToEdge,
-            AddressModeV = WGPUAddressMode.WGPUAddressMode_ClampToEdge,
-            AddressModeW = WGPUAddressMode.WGPUAddressMode_ClampToEdge,
-            MinFilter = WGPUFilterMode.WGPUFilterMode_Linear,
-            MagFilter = WGPUFilterMode.WGPUFilterMode_Linear,
-            MipmapFilter = WGPUMipmapFilterMode.WGPUMipmapFilterMode_Nearest
+            AddressModeU = WGPUAddressMode.ClampToEdge,
+            AddressModeV = WGPUAddressMode.ClampToEdge,
+            AddressModeW = WGPUAddressMode.ClampToEdge,
+            MinFilter = WGPUFilterMode.Linear,
+            MagFilter = WGPUFilterMode.Linear,
+            MipmapFilter = WGPUMipmapFilterMode.Nearest
         });
 
         Span<BindGroupLayoutEntry> layoutEntries = stackalloc BindGroupLayoutEntry[2];
@@ -71,12 +71,12 @@ public sealed class MipmapGenerator : IDisposable
             throw new ObjectDisposedException(nameof(MipmapGenerator));
         if (texture.IsNull)
             throw new ArgumentException("texture is null.", nameof(texture));
-        if (texture.Dimension != WGPUTextureDimension.WGPUTextureDimension_2D)
+        if (texture.Dimension != WGPUTextureDimension._2D)
             throw new NotSupportedException(
                 $"MipmapGenerator only supports 2D / 2D-array textures (got {texture.Dimension}).");
 
         WGPUTextureFormat format = texture.Format;
-        if (format.DefaultSampleType() != WGPUTextureSampleType.WGPUTextureSampleType_Float)
+        if (format.DefaultSampleType() != WGPUTextureSampleType.Float)
             throw new NotSupportedException(
                 $"MipmapGenerator only supports filterable-float color formats (got {format}). " +
                 "Integer, depth, stencil, and unfilterable-float formats need a different shader/sampler combo.");
@@ -106,7 +106,7 @@ public sealed class MipmapGenerator : IDisposable
             {
                 TextureViewDescriptor srcDesc = new()
                 {
-                    Dimension = WGPUTextureViewDimension.WGPUTextureViewDimension_2D,
+                    Dimension = WGPUTextureViewDimension._2D,
                     BaseMipLevel = level - 1U,   // source = the larger level above
                     MipLevelCount = 1U,
                     BaseArrayLayer = layer,
@@ -116,7 +116,7 @@ public sealed class MipmapGenerator : IDisposable
 
                 TextureViewDescriptor dstDesc = new()
                 {
-                    Dimension = WGPUTextureViewDimension.WGPUTextureViewDimension_2D,
+                    Dimension = WGPUTextureViewDimension._2D,
                     BaseMipLevel = level,        // target = the level being written
                     MipLevelCount = 1U,
                     BaseArrayLayer = layer,
@@ -131,8 +131,8 @@ public sealed class MipmapGenerator : IDisposable
                 colorAttachments[0] = new ColorAttachment
                 {
                     View = dstView,
-                    LoadOp = WGPULoadOp.WGPULoadOp_Clear,
-                    StoreOp = WGPUStoreOp.WGPUStoreOp_Store,
+                    LoadOp = WGPULoadOp.Clear,
+                    StoreOp = WGPUStoreOp.Store,
                     ClearValue = new WGPUColor()
                 };
 

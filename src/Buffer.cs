@@ -7,13 +7,6 @@ using System.Runtime.InteropServices;
 
 namespace Brew.Wgpu;
 
-/// <summary>
-/// A GPU buffer. The handle is a value type (a <c>{slot, generation}</c> pair), so copies are
-/// free and can be stored in fields, placed in collections, and shared across threads. Disposing
-/// any copy releases the underlying buffer <b>exactly once</b> and invalidates every copy;
-/// disposing again is a safe no-op, and using a disposed buffer throws
-/// <see cref="ObjectDisposedException"/>.
-/// </summary>
 public readonly struct Buffer : IDisposable, IEquatable<Buffer>
 {
     private readonly int _slot;
@@ -69,7 +62,7 @@ public readonly struct Buffer : IDisposable, IEquatable<Buffer>
         var status = (WGPUMapAsyncStatus)int.MaxValue;
         var callbackInfo = new WGPUBufferMapCallbackInfo
         {
-            mode = WGPUCallbackMode.WGPUCallbackMode_AllowProcessEvents,
+            mode = WGPUCallbackMode.AllowProcessEvents,
             callback = &OnMap,
             userdata1 = Unsafe.AsPointer(ref status),
         };
@@ -85,7 +78,7 @@ public readonly struct Buffer : IDisposable, IEquatable<Buffer>
         *(int*)slot = int.MaxValue;
         var callbackInfo = new WGPUBufferMapCallbackInfo
         {
-            mode = WGPUCallbackMode.WGPUCallbackMode_AllowProcessEvents,
+            mode = WGPUCallbackMode.AllowProcessEvents,
             callback = &OnMap,
             userdata1 = slot,
         };

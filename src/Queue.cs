@@ -16,7 +16,7 @@ public sealed class Queue
     public unsafe void Submit(CommandBuffer cmd)
     {
         var h = cmd.Handle;
-        WGPU.wgpuQueueSubmit(this.Handle, 1, &h);
+        WGPU.wgpuQueueSubmit(this.Handle, new UIntPtr(1), &h);
     }
 
     public unsafe void Submit(scoped ReadOnlySpan<CommandBuffer> commands)
@@ -34,14 +34,14 @@ public sealed class Queue
     }
 
     public unsafe void WriteTexture<T>(
-        Texture destination,
-        scoped ReadOnlySpan<T> data,
-        uint bytesPerRow,
-        uint rowsPerImage,
-        scoped in WGPUExtent3D writeSize,
-        uint mipLevel = 0,
-        WGPUOrigin3D origin = default(WGPUOrigin3D))
-        where T : unmanaged
+      Texture destination,
+      scoped ReadOnlySpan<T> data,
+      uint bytesPerRow,
+      uint rowsPerImage,
+      scoped in WGPUExtent3D writeSize,
+      uint mipLevel = 0,
+      WGPUOrigin3D origin = default(WGPUOrigin3D))
+      where T : unmanaged
     {
         ReadOnlySpan<byte> readOnlySpan = MemoryMarshal.AsBytes<T>(data);
         WGPUTexelCopyTextureInfo texelCopyTextureInfo = new WGPUTexelCopyTextureInfo()
@@ -68,7 +68,7 @@ public sealed class Queue
         {
             mode = (WGPUCallbackMode)2,
             callback = &OnWorkDone,
-            userdata1 = Unsafe.AsPointer(ref maxValue)
+            userdata1 = Unsafe.AsPointer<WGPUQueueWorkDoneStatus>(ref maxValue)
         });
         Async.PollUntilChanged<WGPUQueueWorkDoneStatus>(instance.Handle, ref maxValue, (WGPUQueueWorkDoneStatus)int.MaxValue);
         return maxValue;
@@ -76,7 +76,7 @@ public sealed class Queue
 
     public unsafe QueueWorkDoneRequest BeginOnSubmittedWorkDone()
     {
-        WGPUQueueWorkDoneStatus* slot = (WGPUQueueWorkDoneStatus*)NativeMemory.Alloc(sizeof(WGPUQueueWorkDoneStatus));
+        WGPUQueueWorkDoneStatus* slot = (WGPUQueueWorkDoneStatus*)NativeMemory.Alloc(new UIntPtr(4));
         *(int*)slot = int.MaxValue;
         WGPU.wgpuQueueOnSubmittedWorkDone(this.Handle, new WGPUQueueWorkDoneCallbackInfo()
         {
@@ -87,12 +87,12 @@ public sealed class Queue
         return new QueueWorkDoneRequest(slot);
     }
 
-    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static unsafe void OnWorkDone(
-        WGPUQueueWorkDoneStatus status,
-        WGPUStringView message,
-        void* userdata1,
-        void* userdata2)
+      WGPUQueueWorkDoneStatus status,
+      WGPUStringView message,
+      void* userdata1,
+      void* userdata2)
     {
         *(int*)userdata1 = (int)status;
     }

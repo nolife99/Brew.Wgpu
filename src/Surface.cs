@@ -70,8 +70,8 @@ public readonly struct Surface : IDisposable, IEquatable<Surface>
         TextureUsage usage,
         uint width,
         uint height,
-        WGPUPresentMode presentMode = WGPUPresentMode.WGPUPresentMode_Fifo,
-        WGPUCompositeAlphaMode alphaMode = WGPUCompositeAlphaMode.WGPUCompositeAlphaMode_Auto)
+        WGPUPresentMode presentMode = WGPUPresentMode.Fifo,
+        WGPUCompositeAlphaMode alphaMode = WGPUCompositeAlphaMode.Auto)
     {
         var config = new WGPUSurfaceConfiguration
         {

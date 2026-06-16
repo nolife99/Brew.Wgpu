@@ -3,15 +3,15 @@ namespace Brew.Wgpu.Native
     [NativeTypeName("unsigned int")]
     public enum WGPUCompareFunction : uint
     {
-        WGPUCompareFunction_Undefined = 0x00000000,
-        WGPUCompareFunction_Never = 0x00000001,
-        WGPUCompareFunction_Less = 0x00000002,
-        WGPUCompareFunction_Equal = 0x00000003,
-        WGPUCompareFunction_LessEqual = 0x00000004,
-        WGPUCompareFunction_Greater = 0x00000005,
-        WGPUCompareFunction_NotEqual = 0x00000006,
-        WGPUCompareFunction_GreaterEqual = 0x00000007,
-        WGPUCompareFunction_Always = 0x00000008,
-        WGPUCompareFunction_Force32 = 0x7FFFFFFF,
+        Undefined = 0x00000000,
+        Never = 0x00000001,
+        Less = 0x00000002,
+        Equal = 0x00000003,
+        LessEqual = 0x00000004,
+        Greater = 0x00000005,
+        NotEqual = 0x00000006,
+        GreaterEqual = 0x00000007,
+        Always = 0x00000008,
+        Force32 = 0x7FFFFFFF,
     }
 }

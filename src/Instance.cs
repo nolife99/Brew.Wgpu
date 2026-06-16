@@ -188,7 +188,7 @@ public sealed class Instance : IDisposable
             throw new ObjectDisposedException(nameof(Instance));
     }
 
-    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     private static unsafe void OnAdapter(
       WGPURequestAdapterStatus status,
       WGPUAdapterImpl* adapter,

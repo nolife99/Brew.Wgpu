@@ -14,6 +14,6 @@ namespace Brew.Wgpu.Native
         WGPUSType_SurfaceSourceSwapChainPanel = 0x00030009,
         WGPUSType_PrimitiveStateExtras = 0x0003000A,
         WGPUSType_SamplerDescriptorExtras = 0x0003000B,
-        WGPUNativeSType_Force32 = 0x7FFFFFFF,
+        Force32 = 0x7FFFFFFF,
     }
 }

@@ -180,6 +180,21 @@ public sealed class StagingBelt : IDisposable
         this._unmappedCount = 0;
     }
 
+    /// <summary>
+    /// Returns chunks whose asynchronous remap has finished to the free pool, making them available
+    /// for reuse by <see cref="WriteBuffer"/>. Inspects only requests that have already resolved, so
+    /// it is safe to call at any time and is a no-op when nothing is pending.
+    /// </summary>
+    /// <remarks>
+    /// This method does not pump the wgpu event loop. The remaps scheduled by <see cref="Recall"/>
+    /// complete through <c>AllowProcessEvents</c> callbacks, which only fire while the owning instance
+    /// is being driven, so the caller is responsible for calling <see cref="Instance.ProcessEvents"/>
+    /// (or polling the device) each frame. Without that external poll the recalled chunks never
+    /// resolve, this method has nothing to collect, and the belt keeps allocating fresh chunks
+    /// indefinitely.
+    /// </remarks>
+    public void DrainCompleted() => this.DrainRemapping();
+
     private (int idx, ulong offset) Reserve(ulong size)
     {
         if (this._active >= 0)
@@ -194,7 +209,7 @@ public sealed class StagingBelt : IDisposable
             this.PushClosed(this._active);
             this._active = -1;
         }
-        this.DrainCompleted();
+        this.DrainRemapping();
         int index1 = -1;
         for (int index2 = 0; index2 < this._freeCount; ++index2)
         {
@@ -245,7 +260,7 @@ public sealed class StagingBelt : IDisposable
         return index;
     }
 
-    public unsafe void DrainCompleted()
+    private unsafe void DrainRemapping()
     {
         int num = 0;
         for (int index1 = 0; index1 < this._remappingCount; ++index1)
