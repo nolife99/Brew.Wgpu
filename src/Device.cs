@@ -387,7 +387,7 @@ public sealed class Device : IDisposable
             }
             var __h8 = new WGPUBindGroupDescriptor()
             {
-                layout = layout.Handle,
+                layout = layout.IsNull ? null : layout.Handle,
                 entryCount = (UIntPtr)num,
                 entries = wgpuBindGroupEntryPtr
             };
@@ -498,7 +498,7 @@ public sealed class Device : IDisposable
             wgpuFragmentState1.targets = colorTargetStatePtr;
             WGPUFragmentState wgpuFragmentState2 = wgpuFragmentState1;
             WGPURenderPipelineDescriptor pipelineDescriptor = new WGPURenderPipelineDescriptor();
-            pipelineDescriptor.layout = layout.Handle;
+            pipelineDescriptor.layout = layout.IsNull ? (WGPUPipelineLayoutImpl*)null : layout.Handle;
             ref WGPURenderPipelineDescriptor local2 = ref pipelineDescriptor;
             WGPUVertexState wgpuVertexState1 = new WGPUVertexState();
             wgpuVertexState1.module = vertexShader.Handle;
@@ -656,7 +656,7 @@ public sealed class Device : IDisposable
             wgpuFragmentState1.targets = colorTargetStatePtr;
             WGPUFragmentState wgpuFragmentState2 = wgpuFragmentState1;
             WGPURenderPipelineDescriptor pipelineDescriptor = new WGPURenderPipelineDescriptor();
-            pipelineDescriptor.layout = layout.Handle;
+            pipelineDescriptor.layout = layout.IsNull ? (WGPUPipelineLayoutImpl*)null : layout.Handle;
             ref WGPURenderPipelineDescriptor local4 = ref pipelineDescriptor;
             WGPUVertexState wgpuVertexState1 = new WGPUVertexState();
             wgpuVertexState1.module = vertexShader.Handle;
@@ -737,7 +737,7 @@ public sealed class Device : IDisposable
                 attributes = wgpuVertexAttributePtr
             };
             WGPURenderPipelineDescriptor pipelineDescriptor = new WGPURenderPipelineDescriptor();
-            pipelineDescriptor.layout = layout.Handle;
+            pipelineDescriptor.layout = layout.IsNull ? (WGPUPipelineLayoutImpl*)null : layout.Handle;
             ref WGPURenderPipelineDescriptor local1 = ref pipelineDescriptor;
             WGPUVertexState wgpuVertexState1 = new WGPUVertexState();
             wgpuVertexState1.module = vertexShader.Handle;
@@ -820,7 +820,7 @@ public sealed class Device : IDisposable
                 num2 += attributeCount;
             }
             WGPURenderPipelineDescriptor pipelineDescriptor = new WGPURenderPipelineDescriptor();
-            pipelineDescriptor.layout = layout.Handle;
+            pipelineDescriptor.layout = layout.IsNull ? (WGPUPipelineLayoutImpl*)null : layout.Handle;
             ref WGPURenderPipelineDescriptor local3 = ref pipelineDescriptor;
             WGPUVertexState wgpuVertexState1 = new WGPUVertexState();
             wgpuVertexState1.module = vertexShader.Handle;
@@ -902,7 +902,7 @@ public sealed class Device : IDisposable
         {
             WGPUComputePipelineDescriptor pipelineDescriptor = new WGPUComputePipelineDescriptor();
             pipelineDescriptor.label = WgpuDefaults.OptionalStringView(data, label.Length);
-            pipelineDescriptor.layout = layout.Handle;
+            pipelineDescriptor.layout = layout.IsNull ? (WGPUPipelineLayoutImpl*)null : layout.Handle;
             ref WGPUComputePipelineDescriptor local1 = ref pipelineDescriptor;
             WGPUComputeState wgpuComputeState1 = new WGPUComputeState();
             wgpuComputeState1.module = shader.Handle;

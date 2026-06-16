@@ -62,7 +62,9 @@ public sealed class Instance : IDisposable
         };
         var __h1 = new WGPURequestAdapterOptions()
         {
-            compatibleSurface = compatibleSurface.Handle
+            // Optional: a default Surface means "no compatible surface" -> null, not a thrown
+            // ObjectDisposedException from the handle table on the {0,0} default handle.
+            compatibleSurface = compatibleSurface.IsNull ? (WGPUSurfaceImpl*)null : compatibleSurface.Handle
         };
         WGPU.wgpuInstanceRequestAdapter(this._handle, &__h1, new WGPURequestAdapterCallbackInfo()
         {

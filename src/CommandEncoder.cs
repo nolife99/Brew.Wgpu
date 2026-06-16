@@ -51,7 +51,10 @@ public readonly struct CommandEncoder : IDisposable, IEquatable<CommandEncoder>
             span[index] = new WGPURenderPassColorAttachment()
             {
                 view = local.View.Handle,
-                resolveTarget = local.ResolveTarget.Handle,
+                // ResolveTarget is optional (MSAA only); a default/disposed handle must map to a null
+                // pointer, not throw. The handle table throws on .Handle for a {0,0} default, unlike the
+                // old raw-pointer handles, so guard it the same way the depth view below is guarded.
+                resolveTarget = local.ResolveTarget.IsNull ? (WGPUTextureViewImpl*)null : local.ResolveTarget.Handle,
                 loadOp = local.LoadOp,
                 storeOp = local.StoreOp,
                 clearValue = local.ClearValue,
