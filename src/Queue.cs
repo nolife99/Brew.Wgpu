@@ -21,9 +21,11 @@ public sealed class Queue
 
     public unsafe void Submit(scoped ReadOnlySpan<CommandBuffer> commands)
     {
-        ReadOnlySpan<IntPtr> readOnlySpan = MemoryMarshal.Cast<CommandBuffer, IntPtr>(commands);
-        fixed (IntPtr* numPtr = &readOnlySpan.GetPinnableReference())
-            WGPU.wgpuQueueSubmit(this.Handle, (UIntPtr)readOnlySpan.Length, (WGPUCommandBufferImpl**)numPtr);
+        int count = commands.Length;
+        WGPUCommandBufferImpl** numPtr = stackalloc WGPUCommandBufferImpl*[count];
+        for (int i = 0; i < count; ++i)
+            numPtr[i] = commands[i].Handle;
+        WGPU.wgpuQueueSubmit(this.Handle, (UIntPtr)count, numPtr);
     }
 
     public unsafe void WriteBuffer<T>(Buffer buffer, ulong bufferOffset, scoped ReadOnlySpan<T> data) where T : unmanaged

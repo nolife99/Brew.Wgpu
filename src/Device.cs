@@ -303,18 +303,19 @@ public sealed class Device : IDisposable
       scoped ReadOnlySpan<BindGroupLayout> bindGroupLayouts,
       uint pushConstantBytes)
     {
-        ReadOnlySpan<IntPtr> readOnlySpan = MemoryMarshal.Cast<BindGroupLayout, IntPtr>(bindGroupLayouts);
-        fixed (IntPtr* numPtr = &readOnlySpan.GetPinnableReference())
+        int count = bindGroupLayouts.Length;
+        WGPUBindGroupLayoutImpl** layoutPtrs = stackalloc WGPUBindGroupLayoutImpl*[count];
+        for (int i = 0; i < count; ++i)
+            layoutPtrs[i] = bindGroupLayouts[i].Handle;
+        var __h7 = new WGPUPipelineLayoutDescriptor()
         {
-            var __h7 = new WGPUPipelineLayoutDescriptor()
-            {
-                bindGroupLayoutCount = (UIntPtr)readOnlySpan.Length,
-                bindGroupLayouts = (WGPUBindGroupLayoutImpl**)numPtr,
-                immediateSize = pushConstantBytes
-            };
-            WGPUPipelineLayoutImpl* pipelineLayout = WGPU.wgpuDeviceCreatePipelineLayout(this.Handle, &__h7);
-            return (IntPtr)pipelineLayout != IntPtr.Zero ? new PipelineLayout(pipelineLayout) : throw new ResourceCreationException("PipelineLayout", "wgpuDeviceCreatePipelineLayout");
-        }
+            label = new WGPUStringView() { data = (sbyte*)null, length = WgpuDefaults.StrLen },
+            bindGroupLayoutCount = (UIntPtr)count,
+            bindGroupLayouts = layoutPtrs,
+            immediateSize = pushConstantBytes
+        };
+        WGPUPipelineLayoutImpl* pipelineLayout = WGPU.wgpuDeviceCreatePipelineLayout(this.Handle, &__h7);
+        return (IntPtr)pipelineLayout != IntPtr.Zero ? new PipelineLayout(pipelineLayout) : throw new ResourceCreationException("PipelineLayout", "wgpuDeviceCreatePipelineLayout");
     }
 
     public BindGroup CreateBindGroup(
@@ -358,9 +359,10 @@ public sealed class Device : IDisposable
             }
             span[index] = wgpuBindGroupEntry;
         }
-        ReadOnlySpan<IntPtr> readOnlySpan = MemoryMarshal.Cast<TextureView, IntPtr>(arrayTextureViews);
+        WGPUTextureViewImpl** viewPtrs = stackalloc WGPUTextureViewImpl*[length2];
+        for (int i = 0; i < length2; ++i)
+            viewPtrs[i] = arrayTextureViews[i].Handle;
         fixed (WGPUBindGroupEntry* wgpuBindGroupEntryPtr = &span.GetPinnableReference())
-        fixed (IntPtr* numPtr = &readOnlySpan.GetPinnableReference())
         {
             WGPUBindGroupEntryExtras groupEntryExtras1 = new WGPUBindGroupEntryExtras();
             if (flag)
@@ -372,7 +374,7 @@ public sealed class Device : IDisposable
                     sType = (WGPUSType)196615 /*0x030007*/
                 };
                 local1.chain = wgpuChainedStruct;
-                groupEntryExtras2.textureViews = (WGPUTextureViewImpl**)numPtr;
+                groupEntryExtras2.textureViews = viewPtrs;
                 groupEntryExtras2.textureViewCount = (UIntPtr)length2;
                 WGPUBindGroupEntryExtras groupEntryExtras3 = groupEntryExtras2;
                 ref WGPUBindGroupEntry local2 = ref span[length1];
